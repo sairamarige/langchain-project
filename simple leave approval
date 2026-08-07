@@ -1,0 +1,60 @@
+"""
+Leave Approval Workflow (Simple CLI Version)
+---------------------------------------------
+Rules:
+  - Leave <= 3 days  -> auto-approved
+  - Leave >  3 days  -> requires manager approval (yes/no)
+"""
+
+AUTO_APPROVE_LIMIT = 3
+
+
+def get_employee_details():
+    name = input("Enter employee name: ").strip()
+    while True:
+        raw = input("Enter number of leave days: ").strip()
+        try:
+            days = int(raw)
+            if days <= 0:
+                print("Leave days must be a positive number. Try again.")
+                continue
+            return name, days
+        except ValueError:
+            print("Please enter a valid whole number.")
+
+
+def get_manager_approval(name, days):
+    while True:
+        resp = input(
+            f"Manager approval needed: {name} requested {days} day(s). Approve? (yes/no): "
+        ).strip().lower()
+        if resp in ("yes", "y"):
+            return True
+        if resp in ("no", "n"):
+            return False
+        print("Please answer 'yes' or 'no'.")
+
+
+def run_leave_workflow():
+    name, days = get_employee_details()
+
+    if days <= AUTO_APPROVE_LIMIT:
+        status = "Approved"
+        reason = f"{days} day(s) is within the auto-approval limit ({AUTO_APPROVE_LIMIT})."
+    else:
+        approved = get_manager_approval(name, days)
+        status = "Approved" if approved else "Rejected"
+        reason = "Manager approved the request." if approved else "Manager rejected the request."
+
+    print("\n----- Leave Request Summary -----")
+    print(f"Employee     : {name}")
+    print(f"Leave Days   : {days}")
+    print(f"Final Status : {status}")
+    print(f"Reason       : {reason}")
+    print("----------------------------------")
+
+    return {"employee": name, "leave_days": days, "status": status}
+
+
+if __name__ == "__main__":
+    run_leave_workflow()
