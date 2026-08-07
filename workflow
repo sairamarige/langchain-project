@@ -31,9 +31,8 @@ from langgraph.graph import StateGraph, START, END
 AUTO_APPROVE_LIMIT = 3
 
 
-# ---------------------------------------------------------------------------
 # 1. State definition — the data that flows through every node
-# ---------------------------------------------------------------------------
+
 class LeaveState(TypedDict):
     employee_name: str
     leave_days: int
