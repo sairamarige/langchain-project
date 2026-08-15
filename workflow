@@ -1,30 +1,3 @@
-"""
-Leave Approval Workflow — LangGraph Version
---------------------------------------------
-Graph shape (matches the requested diagram):
-
-    START
-      |
-    Get Employee Details
-      |
-    Check Leave Days
-      |
-    Need Manager Approval?   (conditional branch point)
-      |            \
-      |             \ (<=3 days, skip)
-    Human Approval    \
-      |                \
-    Final Decision <---/
-      |
-     END
-
-Install dependency first:
-    pip install langgraph --break-system-packages
-
-Run:
-    python3 leave_approval_langgraph.py
-"""
-
 from typing import TypedDict, Optional
 from langgraph.graph import StateGraph, START, END
 
@@ -41,9 +14,9 @@ class LeaveState(TypedDict):
     status: Optional[str]              # "Approved" / "Rejected"
 
 
-# ---------------------------------------------------------------------------
+
 # 2. Node functions
-# ---------------------------------------------------------------------------
+
 def get_employee_details(state: LeaveState) -> LeaveState:
     """Node: Get Employee Details — collects name + leave days from the employee."""
     name = input("Enter employee name: ").strip()
@@ -103,35 +76,31 @@ def final_decision(state: LeaveState) -> LeaveState:
     print(f"Employee     : {state['employee_name']}")
     print(f"Leave Days   : {state['leave_days']}")
     print(f"Final Status : {status}")
-    print("----------------------------------")
 
     return {**state, "status": status}
 
 
-# ---------------------------------------------------------------------------
+
 # 3. Routing function for the conditional edge
-# ---------------------------------------------------------------------------
+
 def route_after_check(state: LeaveState) -> str:
     """Used as the conditional edge out of 'need_manager_approval'."""
     return "human_approval" if state["needs_manager_approval"] else "final_decision"
 
 
-# ---------------------------------------------------------------------------
 # 4. Build the graph
-# ---------------------------------------------------------------------------
+
+
 def build_graph():
     graph = StateGraph(LeaveState)
-
     graph.add_node("get_employee_details", get_employee_details)
     graph.add_node("check_leave_days", check_leave_days)
     graph.add_node("need_manager_approval", need_manager_approval)
     graph.add_node("human_approval", human_approval)
     graph.add_node("final_decision", final_decision)
-
     graph.add_edge(START, "get_employee_details")
     graph.add_edge("get_employee_details", "check_leave_days")
     graph.add_edge("check_leave_days", "need_manager_approval")
-
     graph.add_conditional_edges(
         "need_manager_approval",
         route_after_check,
@@ -140,16 +109,14 @@ def build_graph():
             "final_decision": "final_decision",
         },
     )
-
     graph.add_edge("human_approval", "final_decision")
     graph.add_edge("final_decision", END)
 
     return graph.compile()
 
 
-# ---------------------------------------------------------------------------
+
 # 5. Run it
-# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     app = build_graph()
 
