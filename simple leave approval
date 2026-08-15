@@ -1,16 +1,6 @@
-"""
-Leave Approval Workflow (Simple CLI Version)
----------------------------------------------
-Rules:
-  - Leave <= 3 days  -> auto-approved
-  - Leave >  3 days  -> requires manager approval (yes/no)
-"""
-
 AUTO_APPROVE_LIMIT = 3
-
-
 def get_employee_details():
-    name = input("Enter employee name: ").strip()
+    name = input("Enter the employee name: ").strip()
     while True:
         raw = input("Enter number of leave days: ").strip()
         try:
